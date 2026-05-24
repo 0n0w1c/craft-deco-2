@@ -1,0 +1,15 @@
+{
+    "name": "craft-deco-2",
+    "version": "0.1.0",
+    "title": "Craft Deco 2",
+    "author": "0n0w1c",
+    "factorio_version": "2.0",
+    "dependencies": [
+        "base >= 2.0",
+        "? space-age",
+        "alien-biomes-graphics",
+        "! alien-biomes",
+        "! alien-biomes-graphics-prototypes"
+    ],
+    "description": "Craft decorations and more."
+}
