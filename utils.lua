@@ -57,8 +57,8 @@ function utils.make_it_craftable(name, type, group, subgroup, order)
     local entity = data.raw[type] and data.raw[type][name]
     if not entity then return end
 
-    local icon = entity.icon or nil
-    local icons = entity.icons or nil
+    local icon = entity.icon
+    local icons = entity.icons
 
     data:extend({
         {
@@ -70,8 +70,6 @@ function utils.make_it_craftable(name, type, group, subgroup, order)
             icon_size = 64,
             group = group,
             subgroup = subgroup,
-            -- hidden_in_factoriopedia = true,
-            -- factoriopedia_alternative = name,
             order = order,
             stack_size = 20,
             place_result = name,
@@ -84,8 +82,6 @@ function utils.make_it_craftable(name, type, group, subgroup, order)
             energy_required = 1,
             enabled = false,
             category = "crafting",
-            -- hidden_in_factoriopedia = true,
-            -- factoriopedia_alternative = type .. "/" .. name,
             ingredients = utils.entity_ingredients(name, type),
             results = {
                 {

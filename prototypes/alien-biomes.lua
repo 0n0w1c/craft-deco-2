@@ -191,7 +191,4 @@ if mods["alien-biomes-graphics"] then
         end
     end
 
-    -- for _, effect in pairs(landscaping_effects) do
-    --     table.insert(data.raw["technology"]["CRAFTDECO2-landscaping"].effects, effect)
-    -- end
 end
