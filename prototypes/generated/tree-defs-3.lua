@@ -1,5 +1,5 @@
 return {
-{
+    {
         name = "tree-grassland-c",
         locale_key = "craft-deco-2-tree-018",
         icons = {
@@ -487,7 +487,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-grassland-d",
         locale_key = "craft-deco-2-tree-019",
         icons = {
@@ -843,7 +843,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-grassland-e",
         locale_key = "craft-deco-2-tree-020",
         icons = {
@@ -1243,7 +1243,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-grassland-f",
         locale_key = "craft-deco-2-tree-021",
         icons = {
@@ -1599,7 +1599,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-grassland-g",
         locale_key = "craft-deco-2-tree-022",
         icons = {
@@ -1955,7 +1955,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-grassland-h",
         locale_key = "craft-deco-2-tree-023",
         icons = {
@@ -2531,7 +2531,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-grassland-i",
         locale_key = "craft-deco-2-tree-026",
         icons = {
@@ -2887,7 +2887,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-grassland-j",
         locale_key = "craft-deco-2-tree-027",
         icons = {
@@ -3463,7 +3463,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-grassland-k",
         locale_key = "craft-deco-2-tree-028",
         icons = {

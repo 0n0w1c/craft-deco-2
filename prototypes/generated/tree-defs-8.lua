@@ -1,5 +1,5 @@
 return {
-{
+    {
         name = "tree-palm-b",
         locale_key = "craft-deco-2-tree-067",
         icons = {

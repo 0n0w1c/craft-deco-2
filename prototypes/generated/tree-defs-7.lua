@@ -1,5 +1,5 @@
 return {
-{
+    {
         name = "tree-desert-f",
         locale_key = "craft-deco-2-tree-055",
         icons = {
@@ -355,7 +355,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-desert-g",
         locale_key = "craft-deco-2-tree-056",
         icons = {
@@ -753,7 +753,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-desert-h",
         locale_key = "craft-deco-2-tree-057",
         icons = {
@@ -1109,7 +1109,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-desert-i",
         locale_key = "craft-deco-2-tree-058",
         icons = {
@@ -1465,7 +1465,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-desert-j",
         locale_key = "craft-deco-2-tree-059",
         icons = {
@@ -1865,7 +1865,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-desert-k",
         locale_key = "craft-deco-2-tree-060",
         icons = {
@@ -2221,7 +2221,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-desert-l",
         locale_key = "craft-deco-2-tree-061",
         icons = {
@@ -2621,7 +2621,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-desert-m",
         locale_key = "craft-deco-2-tree-062",
         icons = {
@@ -2977,7 +2977,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-desert-n",
         locale_key = "craft-deco-2-tree-063",
         icons = {
@@ -3377,7 +3377,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-snow-a",
         locale_key = "craft-deco-2-tree-064",
         icons = {
@@ -3733,7 +3733,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-volcanic-a",
         locale_key = "craft-deco-2-tree-065",
         icons = {
@@ -4026,7 +4026,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-palm-a",
         locale_key = "craft-deco-2-tree-066",
         icons = {

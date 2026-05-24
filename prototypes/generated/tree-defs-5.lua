@@ -1,5 +1,5 @@
 return {
-{
+    {
         name = "tree-dryland-d",
         locale_key = "craft-deco-2-tree-038",
         icons = {
@@ -575,7 +575,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-dryland-e",
         locale_key = "craft-deco-2-tree-039",
         icons = {
@@ -1063,7 +1063,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-dryland-f",
         locale_key = "craft-deco-2-tree-040",
         icons = {
@@ -1639,7 +1639,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-dryland-g",
         locale_key = "craft-deco-2-tree-041",
         icons = {
@@ -2127,7 +2127,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-dryland-h",
         locale_key = "craft-deco-2-tree-042",
         icons = {
@@ -2703,7 +2703,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-dryland-i",
         locale_key = "craft-deco-2-tree-043",
         icons = {
@@ -3181,7 +3181,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-dryland-j",
         locale_key = "craft-deco-2-tree-044",
         icons = {
@@ -3757,7 +3757,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-dryland-k",
         locale_key = "craft-deco-2-tree-045",
         icons = {

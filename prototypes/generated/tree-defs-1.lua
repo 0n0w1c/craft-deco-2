@@ -1,5 +1,5 @@
 return {
-{
+    {
         name = "tree-wetland-a",
         locale_key = "craft-deco-2-tree-001",
         icons = {
@@ -487,7 +487,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-wetland-b",
         locale_key = "craft-deco-2-tree-002",
         icons = {
@@ -931,7 +931,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-wetland-c",
         locale_key = "craft-deco-2-tree-003",
         icons = {
@@ -1507,7 +1507,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-wetland-d",
         locale_key = "craft-deco-2-tree-004",
         icons = {
@@ -1951,7 +1951,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-wetland-e",
         locale_key = "craft-deco-2-tree-005",
         icons = {
@@ -2527,7 +2527,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-wetland-f",
         locale_key = "craft-deco-2-tree-006",
         icons = {
@@ -2927,7 +2927,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-wetland-g",
         locale_key = "craft-deco-2-tree-007",
         icons = {
@@ -3503,7 +3503,7 @@ return {
             }
         }
     },
-{
+    {
         name = "tree-wetland-h",
         locale_key = "craft-deco-2-tree-008",
         icons = {
