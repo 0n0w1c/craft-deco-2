@@ -1,5 +1,9 @@
--- Alien Biomes integration constants for craft-deco-2.
--- Keep all Alien Biomes prototype names in one place.
+--- Shared Alien Biomes prototype name lists used by craft-deco-2.
+---@class AlienBiomesConstants
+---@field trees string[]
+---@field rock_colors string[]
+---@field rock_bases string[]
+---@field tree_remnants table<string, string>
 
 local constants = {}
 

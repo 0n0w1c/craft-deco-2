@@ -1,10 +1,15 @@
--- Data-updates-stage craftable integration for Alien Biomes trees and rocks.
+--- Data-updates-stage craftable integration for Alien Biomes trees and rocks.
 
 if not mods["alien-biomes-graphics"] then return end
 
 local constants = require("prototypes.alien-biomes.constants")
 local utils = require("utils")
 
+--- Creates an item and recipe if the target entity exists and no item already uses the name.
+---@param name string Entity prototype name.
+---@param prototype_type string Entity prototype type in data.raw.
+---@param subgroup string Item subgroup name.
+---@param order string Sort order.
 local function make_once(name, prototype_type, subgroup, order)
     if data.raw[prototype_type]
         and data.raw[prototype_type][name]
@@ -14,6 +19,8 @@ local function make_once(name, prototype_type, subgroup, order)
     end
 end
 
+--- Adds an unlock effect to the landscaping technology when the recipe exists.
+---@param recipe string Recipe prototype name.
 local function unlock_once(recipe)
     local tech = data.raw.technology and data.raw.technology["craft-deco-2-landscaping"]
     if not (tech and tech.effects and data.raw.recipe and data.raw.recipe[recipe]) then return end
@@ -25,8 +32,6 @@ local function unlock_once(recipe)
     table.insert(tech.effects, { type = "unlock-recipe", recipe = recipe })
 end
 
--- Arborium mods provide their own tree crafting flow. Keep craft-deco-2's
--- Alien Biomes tree prototypes available, but do not add duplicate recipes.
 if not (mods["Arborium"] or mods["Arborium_Renewed"]) then
     for _, name in pairs(constants.trees) do
         make_once(name, "tree", "craftable-alien-biomes-trees", "a[alien-biomes-tree-" .. name .. "]")
@@ -34,9 +39,6 @@ if not (mods["Arborium"] or mods["Arborium_Renewed"]) then
     end
 end
 
--- Rocks are craft-deco-2's existing tinted Alien Biomes rock variants.
--- The later data.raw simple-entity rock copies were intentionally removed to
--- avoid duplicate rock entities and recipes.
 for _, base in pairs(constants.rock_bases) do
     for _, color in pairs(constants.rock_colors) do
         local name = base .. "-" .. color

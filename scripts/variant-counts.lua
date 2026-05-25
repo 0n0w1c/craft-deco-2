@@ -1,5 +1,5 @@
--- Generated runtime graphics-variation counts for craft-deco-2 variant cycling.
--- Names omitted from this table use Factorio range-check fallback.
+--- Generated runtime graphics-variation counts for craft-deco-2 variant cycling.
+---@return table<string, integer>
 
 return {
     ["dead-dry-hairy-tree"] = 12,

@@ -1,6 +1,5 @@
--- Generated runtime tree color counts for craft-deco-2 variant cycling.
--- SHIFT + V uses these counts for tree prototypes that expose leaf color variants
--- through LuaEntity.tree_color_index instead of through separate prototype names.
+--- Generated runtime tree color counts for craft-deco-2 variant cycling.
+---@return table<string, integer>
 
 return {
     ["tree-01"] = 8,

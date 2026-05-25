@@ -1,15 +1,20 @@
--- Final polish for Alien Biomes craftables.
+--- Data-final-fixes-stage polish for Alien Biomes craftable rocks.
 
 if not mods["alien-biomes-graphics"] then return end
 
 local constants = require("prototypes.alien-biomes.constants")
 
+--- Returns the first renderable picture from an entity picture definition.
+---@param entity table|nil Entity prototype table.
+---@return table|nil picture
 local function first_picture(entity)
     if not entity or not entity.pictures then return nil end
     if entity.pictures.filename then return entity.pictures end
     return entity.pictures[1]
 end
 
+--- Replaces a tinted Alien Biomes rock entity icon with a layered icon.
+---@param entity table|nil Simple entity prototype table.
 local function set_rock_icon(entity)
     if not entity then return end
 
@@ -34,6 +39,8 @@ local function set_rock_icon(entity)
     } }
 end
 
+--- Copies a rock entity's generated layered icon to its craftable item.
+---@param name string Rock prototype name.
 local function patch_craft_deco_rock_item(name)
     local item = data.raw.item and data.raw.item[name]
     local entity = data.raw["simple-entity"] and data.raw["simple-entity"][name]

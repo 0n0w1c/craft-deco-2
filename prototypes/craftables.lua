@@ -1,10 +1,10 @@
+--- Creates craftable items and recipes for configured vanilla and Space Age entities.
+
 local utils = require("utils")
 local base_rocks = CRAFTDECO2.CONFIG.BASE_ROCKS
 local craftable_trees = CRAFTDECO2.CONFIG.CRAFTABLE_TREES
 local craftable_alive_trees = CRAFTDECO2.CONFIG.CRAFTABLE_ALIVE_TREES
 
--- do not delete the following comment
--- local craftable_corpses = CRAFTDECO2.CONFIG.CRAFTABLE_CORPSE
 
 for planet, rocks in pairs(base_rocks) do
     for _, name in pairs(rocks) do
@@ -33,7 +33,6 @@ for planet, trees in pairs(craftable_alive_trees) do
     end
 end
 
--- add craftable lightning attractor, it is a special prototype
 if mods['space-age'] then
     utils.make_it_craftable("fulgoran-ruin-attractor", "lightning-attractor", CRAFTDECO2.ITEM_GROUP,
         "craftable-attractors",

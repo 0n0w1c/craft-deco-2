@@ -1,3 +1,8 @@
+--- Shared configuration for craft-deco-2 prototype generation.
+---@class CraftDeco2
+---@field CONFIG table
+---@field ITEM_GROUP string
+
 local CRAFTDECO2 = {}
 
 local utils = require("utils")

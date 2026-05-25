@@ -1,5 +1,5 @@
--- Generated runtime prototype variant groups for craft-deco-2.
--- These groups cycle between separate prototypes that share the same graphics family.
+--- Generated runtime prototype variant groups for craft-deco-2.
+---@return table<string, string[]>
 
 return {
     ["rock-big-aubergine"] = { "rock-big-tan", "rock-big-white", "rock-big-grey", "rock-big-black", "rock-big-purple", "rock-big-red", "rock-big-violet", "rock-big-dustyrose", "rock-big-cream", "rock-big-brown", "rock-big-beige", "rock-big-aubergine" },

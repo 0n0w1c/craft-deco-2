@@ -1,5 +1,5 @@
--- Generated from data-raw-dump-2.0.77.json. Do not edit by hand.
--- Alien Biomes graphics-backed prototypes; terrain/tile prototypes intentionally excluded.
+--- Generated Alien Biomes corpse prototypes from data.raw.
+---@return table[] prototypes
 
 return {
     {

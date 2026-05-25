@@ -1,4 +1,4 @@
--- Custom inputs used by control.lua to cycle placed tree/rock variants.
+--- Custom input prototypes for cycling decorative variants.
 
 data:extend({
     {

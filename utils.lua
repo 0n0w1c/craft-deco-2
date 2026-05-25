@@ -1,18 +1,26 @@
 local utils = {}
 
-function utils.array_concat(t1, t2)
-    for k, v in pairs(t2) do
-        if type(v) == "table" then
-            if not t1[k] then
-                t1[k] = {}
+--- Recursively merges values from one array/table into another.
+--- Nested tables are merged by key; scalar values are appended to the target table.
+---@param target table Table to modify in place.
+---@param source table Values to merge into the target table.
+function utils.array_concat(target, source)
+    for key, value in pairs(source) do
+        if type(value) == "table" then
+            if not target[key] then
+                target[key] = {}
             end
-            utils.array_concat(t1[k], v)
+            utils.array_concat(target[key], value)
         else
-            table.insert(t1, v)
+            table.insert(target, value)
         end
     end
 end
 
+--- Creates an item subgroup prototype.
+---@param name string Item subgroup name.
+---@param group string Parent item group name.
+---@param order string Sort order.
 function utils.create_item_subgroup(name, group, order)
     data:extend({
         {
@@ -24,8 +32,12 @@ function utils.create_item_subgroup(name, group, order)
     })
 end
 
-function utils.entity_ingredients(name, type)
-    local entity = data.raw[type] and data.raw[type][name]
+--- Builds recipe ingredients from an entity's mining results.
+---@param name string Entity prototype name.
+---@param prototype_type string Entity prototype type in data.raw.
+---@return table ingredients Recipe ingredient list.
+function utils.entity_ingredients(name, prototype_type)
+    local entity = data.raw[prototype_type] and data.raw[prototype_type][name]
     local ingredients = {}
 
     if not entity or not entity.minable then
@@ -53,8 +65,14 @@ function utils.entity_ingredients(name, type)
     return ingredients
 end
 
-function utils.make_it_craftable(name, type, group, subgroup, order)
-    local entity_type = data.raw[type]
+--- Creates matching item and recipe prototypes for an existing placeable entity.
+---@param name string Entity prototype name.
+---@param prototype_type string Entity prototype type in data.raw.
+---@param group string Item group name.
+---@param subgroup string Item subgroup name.
+---@param order string Item and recipe sort order.
+function utils.make_it_craftable(name, prototype_type, group, subgroup, order)
+    local entity_type = data.raw[prototype_type]
     if not entity_type then return end
 
     local entity = entity_type[name]
@@ -87,7 +105,7 @@ function utils.make_it_craftable(name, type, group, subgroup, order)
         energy_required = 1,
         enabled = false,
         category = "crafting",
-        ingredients = utils.entity_ingredients(name, type),
+        ingredients = utils.entity_ingredients(name, prototype_type),
         results = {
             {
                 type = "item",

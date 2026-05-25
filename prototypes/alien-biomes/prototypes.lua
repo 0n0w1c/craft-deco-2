@@ -1,3 +1,5 @@
+--- Data-stage Alien Biomes prototype definitions backed by alien-biomes-graphics.
+
 if not mods["alien-biomes-graphics"] then return end
 
 local tree_def_chunks = {
@@ -54,12 +56,19 @@ local branch_generation = {
     repeat_count = 15,
 }
 
+--- Copies a sprite definition and optionally replaces its flags.
+---@param def table Source sprite definition.
+---@param flags string[]|nil Sprite flags.
+---@return table sprite
 local function sprite(def, flags)
     local s = table.deepcopy(def)
     if flags then s.flags = flags end
     return s
 end
 
+--- Converts a generated Alien Biomes graphics definition into a Factorio tree variation.
+---@param def table Generated tree variation definition.
+---@return table variation
 local function make_variation(def)
     local reflection = table.deepcopy(def.water_reflection)
     reflection.priority = "extra-high"
@@ -80,6 +89,9 @@ local function make_variation(def)
     return variation
 end
 
+--- Builds a tree prototype from a generated Alien Biomes tree definition.
+---@param def table Generated tree definition.
+---@return table tree
 local function make_tree(def)
     local tree = table.deepcopy(tree_common)
     tree.name = def.name
@@ -94,6 +106,8 @@ local function make_tree(def)
     return tree
 end
 
+--- Extends a prototype only when the same type/name does not already exist.
+---@param prototype table Factorio prototype table.
 local function extend_once(prototype)
     if not (data.raw[prototype.type] and data.raw[prototype.type][prototype.name]) then
         data:extend({ prototype })
@@ -117,12 +131,6 @@ local generated_sets = {
     require("prototypes.alien-biomes.generated.corpses"),
     require("prototypes.alien-biomes.generated.trees"),
 }
-
-local function extend_once(prototype)
-    if not (data.raw[prototype.type] and data.raw[prototype.type][prototype.name]) then
-        data:extend({ prototype })
-    end
-end
 
 for _, prototypes in pairs(generated_sets) do
     for _, prototype in pairs(prototypes) do
