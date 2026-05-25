@@ -54,28 +54,34 @@ function utils.entity_ingredients(name, type)
 end
 
 function utils.make_it_craftable(name, type, group, subgroup, order)
-    local entity = data.raw[type] and data.raw[type][name]
+    local entity_type = data.raw[type]
+    if not entity_type then return end
+
+    local entity = entity_type[name]
     if not entity then return end
 
-    local icon = entity.icon
-    local icons = entity.icons
+    local item = {
+        type = "item",
+        name = name,
+        icon_size = 64,
+        group = group,
+        subgroup = subgroup,
+        order = order,
+        stack_size = 20,
+        place_result = name,
+        localised_name = entity.localised_name
+    }
+
+    if entity.icons then
+        item.icons = entity.icons
+    elseif entity.icon then
+        item.icon = entity.icon
+    else
+        item.icon = "__craft-deco-2__/graphics/icons/missing.png"
+    end
 
     data:extend({
-        {
-            type = "item",
-            name = name,
-            icon = icon,
-            icons = icons,
-
-            icon_size = 64,
-            group = group,
-            subgroup = subgroup,
-            order = order,
-            stack_size = 20,
-            place_result = name,
-            localised_name = entity.localised_name
-
-        },
+        item,
         {
             type = "recipe",
             name = name,
