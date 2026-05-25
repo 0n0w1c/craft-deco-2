@@ -1,6 +1,8 @@
 CRAFTDECO2 = require("config")
 
-require("prototypes.generated")
+require("prototypes.variant-cycler-input")
+
+require("prototypes.alien-biomes.prototypes")
 
 require("prototypes.item-group")
 require("prototypes.craftables")

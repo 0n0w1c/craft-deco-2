@@ -1,1 +1,1 @@
-require("prototypes.alien-biomes")
+require("prototypes.alien-biomes.craftables")

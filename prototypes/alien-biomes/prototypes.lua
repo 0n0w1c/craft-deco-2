@@ -1,12 +1,14 @@
+if not mods["alien-biomes-graphics"] then return end
+
 local tree_def_chunks = {
-    require("prototypes.generated.tree-defs-1"),
-    require("prototypes.generated.tree-defs-2"),
-    require("prototypes.generated.tree-defs-3"),
-    require("prototypes.generated.tree-defs-4"),
-    require("prototypes.generated.tree-defs-5"),
-    require("prototypes.generated.tree-defs-6"),
-    require("prototypes.generated.tree-defs-7"),
-    require("prototypes.generated.tree-defs-8"),
+    require("prototypes.alien-biomes.generated.tree-defs-1"),
+    require("prototypes.alien-biomes.generated.tree-defs-2"),
+    require("prototypes.alien-biomes.generated.tree-defs-3"),
+    require("prototypes.alien-biomes.generated.tree-defs-4"),
+    require("prototypes.alien-biomes.generated.tree-defs-5"),
+    require("prototypes.alien-biomes.generated.tree-defs-6"),
+    require("prototypes.alien-biomes.generated.tree-defs-7"),
+    require("prototypes.alien-biomes.generated.tree-defs-8"),
 }
 
 local tree_defs = {}
@@ -16,7 +18,7 @@ for _, chunk in pairs(tree_def_chunks) do
     end
 end
 
-local rock_defs = require("prototypes.generated.rock-defs")
+local rock_defs = require("prototypes.alien-biomes.generated.rock-defs")
 
 local tree_common = {
     type = "tree",
@@ -111,42 +113,29 @@ for _, def in pairs(rock_defs) do
     extend_once(rock)
 end
 
-local rock_colors = {
-    "tan", "white", "grey", "black", "purple", "red",
-    "violet", "dustyrose", "cream", "brown", "beige", "aubergine",
+local generated_sets = {
+    require("prototypes.alien-biomes.generated.corpses"),
+    require("prototypes.alien-biomes.generated.trees"),
 }
 
-local function first_picture(entity)
-    if not entity or not entity.pictures then return nil end
-    if entity.pictures.filename then return entity.pictures end
-    return entity.pictures[1]
+local function extend_once(prototype)
+    if not (data.raw[prototype.type] and data.raw[prototype.type][prototype.name]) then
+        data:extend({ prototype })
+    end
 end
 
-local function set_rock_icon(entity)
-    if not entity then return end
-
-    local kind =
-        entity.name:match("^rock%-huge%-") and "huge"
-        or entity.name:match("^rock%-big%-") and "big"
-
-    if not kind then return end
-
-    local picture = first_picture(entity)
-    if not picture then return end
-
-    entity.icon = nil
-    entity.icon_size = nil
-    entity.icon_mipmaps = nil
-    entity.icons = { {
-        icon = kind == "big"
-            and "__craft-deco-2__/graphics/icons/big-rock-01.png"
-            or "__craft-deco-2__/graphics/icons/huge-rock-05.png",
-        icon_size = 64,
-        tint = picture.tint,
-    } }
+for _, prototypes in pairs(generated_sets) do
+    for _, prototype in pairs(prototypes) do
+        extend_once(prototype)
+    end
 end
 
-for _, color in pairs(rock_colors) do
-    set_rock_icon(data.raw["simple-entity"]["rock-huge-" .. color])
-    set_rock_icon(data.raw["simple-entity"]["rock-big-" .. color])
+local constants = require("prototypes.alien-biomes.constants")
+
+for tree_name, remnant in pairs(constants.tree_remnants) do
+    local tree = data.raw.tree and data.raw.tree[tree_name]
+    if tree and data.raw.corpse and data.raw.corpse[remnant] then
+        tree.corpse = remnant
+        tree.remains_when_mined = remnant
+    end
 end
