@@ -63,7 +63,6 @@ function utils.make_it_craftable(name, type, group, subgroup, order)
     local item = {
         type = "item",
         name = name,
-        icon_size = 64,
         group = group,
         subgroup = subgroup,
         order = order,
@@ -76,11 +75,11 @@ function utils.make_it_craftable(name, type, group, subgroup, order)
         item.icons = entity.icons
     elseif entity.icon then
         item.icon = entity.icon
+        item.icon_size = entity.icon_size or 64
     else
         item.icon = "__craft-deco-2__/graphics/icons/missing.png"
+        item.icon_size = 64
     end
-
-    data:extend({ item })
 
     local recipe = {
         type = "recipe",
@@ -98,7 +97,7 @@ function utils.make_it_craftable(name, type, group, subgroup, order)
         }
     }
 
-    data:extend({ recipe })
+    data:extend({ item, recipe })
 end
 
 return utils
