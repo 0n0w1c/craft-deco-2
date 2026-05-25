@@ -80,24 +80,25 @@ function utils.make_it_craftable(name, type, group, subgroup, order)
         item.icon = "__craft-deco-2__/graphics/icons/missing.png"
     end
 
-    data:extend({
-        item,
-        {
-            type = "recipe",
-            name = name,
-            energy_required = 1,
-            enabled = false,
-            category = "crafting",
-            ingredients = utils.entity_ingredients(name, type),
-            results = {
-                {
-                    type = "item",
-                    name = name,
-                    amount = 1
-                }
+    data:extend({ item })
+
+    local recipe = {
+        type = "recipe",
+        name = name,
+        energy_required = 1,
+        enabled = false,
+        category = "crafting",
+        ingredients = utils.entity_ingredients(name, type),
+        results = {
+            {
+                type = "item",
+                name = name,
+                amount = 1
             }
         }
-    })
+    }
+
+    data:extend({ recipe })
 end
 
 return utils
