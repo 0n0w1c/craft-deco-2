@@ -74,16 +74,13 @@ local function add_names(names, list)
     end
 end
 
+local alien_biomes_constants = require("prototypes.alien-biomes.constants")
+
 local function add_alien_biomes_names(names)
-    local ok, constants = pcall(require, "prototypes.alien-biomes.constants")
-    if not ok or not constants then
-        return
-    end
+    add_names(names, alien_biomes_constants.trees)
 
-    add_names(names, constants.trees)
-
-    for _, base in pairs(constants.rock_bases or {}) do
-        for _, color in pairs(constants.rock_colors or {}) do
+    for _, base in pairs(alien_biomes_constants.rock_bases or {}) do
+        for _, color in pairs(alien_biomes_constants.rock_colors or {}) do
             add_name(names, base .. "-" .. color)
         end
     end
@@ -128,65 +125,34 @@ local function selected_tracked_entity(player)
     return nil
 end
 
-local function safe_get_number(object, key)
+local function get_number(object, key)
     if not object then
         return nil
     end
 
-    local ok, value = pcall(function()
-        return object[key]
-    end)
-
-    if ok and type(value) == "number" then
+    local value = object[key]
+    if type(value) == "number" then
         return value
     end
 
     return nil
 end
 
-local function safe_set(object, key, value)
+local function set_number(object, key, value)
     if not object or value == nil then
         return false
     end
 
-    local ok = pcall(function()
-        object[key] = value
-    end)
-
-    return ok == true
-end
-
-local function entity_max_health(entity)
-    return safe_get_number(entity, "max_health")
-        or safe_get_number(entity.prototype, "max_health")
-end
-
-local function health_ratio(entity)
-    local max_health = entity_max_health(entity)
-    if entity.health and max_health and max_health > 0 then
-        return entity.health / max_health
-    end
-
-    return nil
-end
-
-local function apply_health_ratio(entity, ratio)
-    if not (entity and entity.valid and entity.health and ratio) then
-        return
-    end
-
-    local max_health = entity_max_health(entity)
-    if max_health and max_health > 0 then
-        entity.health = math.max(1, max_health * ratio)
-    end
+    object[key] = value
+    return true
 end
 
 local function capture_variation_state(entity)
     return {
-        graphics_variation = safe_get_number(entity, "graphics_variation"),
-        tree_color_index = safe_get_number(entity, "tree_color_index"),
-        tree_stage_index = safe_get_number(entity, "tree_stage_index"),
-        tree_gray_stage_index = safe_get_number(entity, "tree_gray_stage_index"),
+        graphics_variation = get_number(entity, "graphics_variation"),
+        tree_color_index = get_number(entity, "tree_color_index"),
+        tree_stage_index = get_number(entity, "tree_stage_index"),
+        tree_gray_stage_index = get_number(entity, "tree_gray_stage_index"),
     }
 end
 
@@ -195,10 +161,10 @@ local function restore_variation_state(entity, state)
         return
     end
 
-    safe_set(entity, "graphics_variation", state.graphics_variation)
-    safe_set(entity, "tree_color_index", state.tree_color_index)
-    safe_set(entity, "tree_stage_index", state.tree_stage_index)
-    safe_set(entity, "tree_gray_stage_index", state.tree_gray_stage_index)
+    set_number(entity, "graphics_variation", state.graphics_variation)
+    set_number(entity, "tree_color_index", state.tree_color_index)
+    set_number(entity, "tree_stage_index", state.tree_stage_index)
+    set_number(entity, "tree_gray_stage_index", state.tree_gray_stage_index)
 end
 
 local function next_name_in_group(entity_name)
@@ -226,13 +192,13 @@ local function next_name_in_group(entity_name)
     return nil
 end
 
+
 local function replace_with_prototype(entity, next_name, player)
     local surface = entity.surface
     local position = entity.position
     local direction = entity.direction
     local force = entity.force
     local variation_state = capture_variation_state(entity)
-    local ratio = health_ratio(entity)
 
     entity.destroy({ raise_destroy = true, player = player })
 
@@ -248,7 +214,6 @@ local function replace_with_prototype(entity, next_name, player)
 
     if replacement and replacement.valid then
         restore_variation_state(replacement, variation_state)
-        apply_health_ratio(replacement, ratio)
         return true
     end
 
@@ -270,13 +235,13 @@ local function cycle_tree_color(entity)
         return false
     end
 
-    local current = safe_get_number(entity, "tree_color_index") or 1
+    local current = get_number(entity, "tree_color_index") or 1
     local next_color = current + 1
     if current < 1 or current >= count then
         next_color = 1
     end
 
-    return safe_set(entity, "tree_color_index", next_color)
+    return set_number(entity, "tree_color_index", next_color)
 end
 
 local function cycle_graphics_variation(entity)
@@ -285,7 +250,7 @@ local function cycle_graphics_variation(entity)
         return false
     end
 
-    local current = safe_get_number(entity, "graphics_variation")
+    local current = get_number(entity, "graphics_variation")
     if not current then
         return false
     end
@@ -295,7 +260,7 @@ local function cycle_graphics_variation(entity)
         next_variation = 1
     end
 
-    return safe_set(entity, "graphics_variation", next_variation)
+    return set_number(entity, "graphics_variation", next_variation)
 end
 
 function variant_cycler.on_cycle_color_variant(event)
