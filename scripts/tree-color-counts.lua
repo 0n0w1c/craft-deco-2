@@ -17,4 +17,5 @@ return {
     ["tree-09"] = 7,
     ["tree-09-brown"] = 7,
     ["tree-09-red"] = 7,
+    ["tree-snow-a"] = 32,
 }
