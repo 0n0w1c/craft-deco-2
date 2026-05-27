@@ -8,8 +8,7 @@
         "base >= 2.0",
         "? space-age",
         "alien-biomes-graphics",
-        "! alien-biomes",
-        "! alien-biomes-graphics-prototypes"
+        "! alien-biomes"
     ],
-    "description": "Craft decorations and more."
+    "description": "Craft rocks, trees, and more."
 }
