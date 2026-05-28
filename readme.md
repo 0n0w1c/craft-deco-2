@@ -15,4 +15,6 @@ When hovering over a rock or tree:
 
 #### Credits
 
-Fork of [Craft Deco](https://mods.factorio.com/mod/craft-deco).  
+Fork of [Craft Deco](https://mods.factorio.com/mod/craft-deco)  
+Graphics by [Alien Biomes Graphics](https://mods.factorio.com/mod/alien-biomes-graphics)  
+(Alien Biomes is optional)
