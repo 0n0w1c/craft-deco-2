@@ -19,7 +19,7 @@ local GUI_PREFIX = "craft-deco-2-variant-picker-"
 local BUTTON_SIZE = 88
 local BUTTON_COLUMNS = 6
 local BUTTON_SPACING = 8
-local SECTION_WIDTH = BUTTON_COLUMNS * BUTTON_SIZE + (BUTTON_COLUMNS - 1) * BUTTON_SPACING + 8
+local SECTION_WIDTH = BUTTON_COLUMNS * BUTTON_SIZE + (BUTTON_COLUMNS - 1) * BUTTON_SPACING + 12
 local FRAME_WIDTH = SECTION_WIDTH + 28
 local SCROLL_WIDTH = SECTION_WIDTH + 8
 local SCROLL_HEIGHT = 656
@@ -503,7 +503,7 @@ local function add_section(parent, caption)
     outer.style.minimal_width = SECTION_WIDTH
     outer.style.maximal_width = SECTION_WIDTH
     outer.style.bottom_margin = 10
-    outer.style.padding = 8
+    outer.style.padding = 6
 
     local label = outer.add({ type = "label", caption = caption })
     label.style.bottom_margin = 6
@@ -707,7 +707,8 @@ function variant_cycler.on_gui_click(event)
         if type(prototype_name) == "string" and prototype_name ~= entity.name and prototypes.entity[prototype_name] then
             local position = entity.position
             if replace_with_prototype(entity, prototype_name, player) then
-                player_gui_state(player.index).entity = player.surface.find_entity(prototype_name, position) or selected_tracked_entity(player)
+                player_gui_state(player.index).entity = player.surface.find_entity(prototype_name, position) or
+                    selected_tracked_entity(player)
             end
         end
     elseif action == "tree-color" then
