@@ -19,4 +19,21 @@ data:extend({
         localised_name = { "controls.craft-deco-2-cycle-shape-variant" },
         localised_description = { "controls-description.craft-deco-2-cycle-shape-variant" },
     },
+    {
+        type = "custom-input",
+        name = "craft-deco-2-open-variant-picker",
+        key_sequence = "CONTROL + V",
+        consuming = "none",
+        include_selected_prototype = true,
+        localised_name = { "controls.craft-deco-2-open-variant-picker" },
+        localised_description = { "controls-description.craft-deco-2-open-variant-picker" },
+    },
+    {
+        type = "custom-input",
+        name = "craft-deco-2-open-variant-picker-click",
+        key_sequence = "",
+        linked_game_control = "open-gui",
+        consuming = "none",
+        include_selected_prototype = true,
+    },
 })
