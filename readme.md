@@ -6,12 +6,12 @@ Craft rocks, trees, and more.
 
 #### Variant cycling
 
+When hovering over a rock, tree, or decorative:  
+
 - `Left click` opens Decorative variants GUI
 
-When hovering over a rock or tree:  
-
-- `Shift + V` cycles leaf/color variants.  
-- `Shift + B` cycles trunk/shape/sprite variants.  
+- `Shift + V` cycles leaf/color variants   
+- `Shift + B` cycles trunk/shape/sprite variants   
 
 ---
 
