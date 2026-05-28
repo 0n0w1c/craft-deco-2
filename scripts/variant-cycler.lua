@@ -539,16 +539,17 @@ local function picker_element_name(suffix)
 end
 
 --- Returns tooltip text for a runtime variant button.
----@param label string
+---@param label LocalisedString|string
 ---@param index integer
 ---@param current integer|nil
----@return string caption
+---@return LocalisedString caption
 local function variant_tooltip(label, index, current)
+    local caption = { "craft-deco-2.variant-number", label, index }
     if current == index then
-        return "[" .. label .. " " .. index .. "]"
+        return { "craft-deco-2.current-variant-number", caption }
     end
 
-    return label .. " " .. index
+    return caption
 end
 
 --- Applies the common square size used by all picker sprite buttons.
@@ -612,7 +613,7 @@ end
 ---@param parent LuaGuiElement
 ---@param entity LuaEntity
 ---@param action "tree-color"|"graphics"
----@param label string
+---@param label LocalisedString|string
 ---@param index integer
 ---@param current integer|nil
 local function add_variant_sprite_button(parent, entity, action, label, index, current)
@@ -663,7 +664,7 @@ end
 ---@param entity LuaEntity
 ---@return LocalisedString caption
 local function selected_label_caption(entity)
-    return { "", "Selected: ", entity.localised_name, " (", entity.name, ")" }
+    return { "craft-deco-2.selected-entity", entity.localised_name, entity.name }
 end
 
 --- Adds the selected-entity summary line outside the scrolling content.
@@ -710,7 +711,7 @@ local function add_prototype_section(parent, entity)
         return
     end
 
-    local table_element = add_section(parent, "Prototype / color variants")
+    local table_element = add_section(parent, { "craft-deco-2.prototype-color-variants" })
     for _, prototype_name in ipairs(group) do
         if prototypes.entity[prototype_name] then
             add_prototype_button(table_element, prototype_name, entity.name)
@@ -732,9 +733,9 @@ local function add_tree_color_section(parent, entity)
     end
 
     local current_color = get_number(entity, "tree_color_index") or 1
-    local table_element = add_section(parent, "Tree color index")
+    local table_element = add_section(parent, { "craft-deco-2.tree-color-index" })
     for index = 1, color_count do
-        add_variant_sprite_button(table_element, entity, "tree-color", "Color", index, current_color)
+        add_variant_sprite_button(table_element, entity, "tree-color", { "craft-deco-2.color" }, index, current_color)
     end
 end
 
@@ -748,9 +749,9 @@ local function add_graphics_section(parent, entity)
     end
 
     local current_variation = get_number(entity, "graphics_variation") or 1
-    local table_element = add_section(parent, "Shape / graphics variants")
+    local table_element = add_section(parent, { "craft-deco-2.shape-graphics-variants" })
     for index = 1, variation_count do
-        add_variant_sprite_button(table_element, entity, "graphics", "Shape", index, current_variation)
+        add_variant_sprite_button(table_element, entity, "graphics", { "craft-deco-2.shape" }, index, current_variation)
     end
 end
 
@@ -875,7 +876,7 @@ local function add_titlebar(frame)
     local titlebar = frame.add({ type = "flow", direction = "horizontal", style = "frame_header_flow" })
     titlebar.drag_target = frame
 
-    local title = titlebar.add({ type = "label", style = "frame_title", caption = "Decorative variants" })
+    local title = titlebar.add({ type = "label", style = "frame_title", caption = { "craft-deco-2.variant-picker-title" } })
     title.drag_target = frame
 
     local filler = titlebar.add({ type = "empty-widget", style = "draggable_space_header" })
