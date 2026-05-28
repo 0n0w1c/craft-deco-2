@@ -3,6 +3,10 @@
 ---@field on_open_variant_picker fun(event: EventData.CustomInputEvent) Handles picker-opening custom inputs.
 ---@field on_gui_click fun(event: EventData.on_gui_click) Handles variant picker GUI clicks.
 ---@field on_gui_closed fun(event: EventData.on_gui_closed) Handles picker close events.
+---@field on_entity_created fun(event: EventData.on_built_entity|EventData.script_raised_built|EventData.script_raised_revive) Sets created supported entities to neutral force.
+---@field on_robot_built_entity fun(event: EventData.on_robot_built_entity) Sets robot-built supported entities to neutral force.
+---@field on_player_removed fun(event: EventData.on_player_removed) Clears picker state for removed players.
+---@field on_configuration_changed fun() Clears invalid runtime references after configuration changes.
 ---@field on_cycle_color_variant fun(event: EventData.CustomInputEvent) Handles the color/prototype quick-cycle input.
 ---@field on_cycle_shape_variant fun(event: EventData.CustomInputEvent) Handles the graphics/shape quick-cycle input.
 
@@ -19,15 +23,26 @@ local GUI_PREFIX = "craft-deco-2-variant-picker-"
 local BUTTON_SIZE = 88
 local BUTTON_COLUMNS = 6
 local BUTTON_SPACING = 8
-local SECTION_WIDTH = BUTTON_COLUMNS * BUTTON_SIZE + (BUTTON_COLUMNS - 1) * BUTTON_SPACING + 12
-local FRAME_WIDTH = SECTION_WIDTH + 28
-local SCROLL_WIDTH = SECTION_WIDTH + 8
+local BUTTON_TABLE_WIDTH = BUTTON_COLUMNS * BUTTON_SIZE + (BUTTON_COLUMNS - 1) * BUTTON_SPACING
+
+local CONTENT_WIDTH_NO_SCROLLBAR = BUTTON_TABLE_WIDTH + 32
+local CONTENT_WIDTH_WITH_SCROLLBAR = BUTTON_TABLE_WIDTH + 36
+local SCROLL_WIDTH_NO_SCROLLBAR = CONTENT_WIDTH_NO_SCROLLBAR
+local SCROLL_WIDTH_WITH_SCROLLBAR = CONTENT_WIDTH_WITH_SCROLLBAR + 16
+local FRAME_WIDTH_NO_SCROLLBAR = SCROLL_WIDTH_NO_SCROLLBAR + 22
+local FRAME_WIDTH_WITH_SCROLLBAR = SCROLL_WIDTH_WITH_SCROLLBAR + 22
 local SCROLL_HEIGHT = 656
+local SCROLL_TOP_GUTTER = 8
+
+local SECTION_HEIGHT_GUTTER = 76
 
 ---@alias CraftDecoVariantAction "close"|"prototype"|"tree-color"|"graphics"
 
 ---@class CraftDecoVariantPickerState
 ---@field entity LuaEntity|nil
+---@field entity_name string|nil
+---@field surface_index uint|nil
+---@field position MapPosition|nil
 
 ---@class CraftDecoVariationState
 ---@field graphics_variation number|nil
@@ -190,6 +205,22 @@ local function set_number(object, key, value)
     return true
 end
 
+--- Assigns an entity to the neutral force when possible.
+---
+--- Rocks, trees, and decoratives should remain neutral world entities rather
+--- than becoming owned by the placing player's force.
+---@param entity LuaEntity|nil
+local function set_neutral_force(entity)
+    if not (entity and entity.valid) then
+        return
+    end
+
+    local neutral = game.forces.neutral
+    if neutral then
+        entity.force = neutral
+    end
+end
+
 --- Reads a numeric GUI tag value.
 ---@param tags Tags|nil
 ---@param key string
@@ -294,7 +325,6 @@ local function replace_with_prototype(entity, next_name, player)
     local surface = entity.surface
     local position = entity.position
     local direction = entity.direction
-    local force = entity.force
     local variation_state = capture_variation_state(entity)
 
     entity.destroy({ raise_destroy = true, player = player })
@@ -303,13 +333,14 @@ local function replace_with_prototype(entity, next_name, player)
         name = next_name,
         position = position,
         direction = direction,
-        force = force,
+        force = "neutral",
         player = player,
         raise_built = true,
         create_build_effect_smoke = false,
     })
 
     if replacement and replacement.valid then
+        set_neutral_force(replacement)
         restore_variation_state(replacement, variation_state)
         return true
     end
@@ -383,6 +414,79 @@ local function player_gui_state(player_index)
     return storage.craft_deco_2_variant_picker[player_index]
 end
 
+--- Stores the entity currently edited by a player's picker.
+---@param player_index uint
+---@param entity LuaEntity|nil
+local function set_player_picker_entity(player_index, entity)
+    local state = player_gui_state(player_index)
+    if entity and entity.valid then
+        state.entity = entity
+        state.entity_name = entity.name
+        state.surface_index = entity.surface.index
+        state.position = entity.position
+        return
+    end
+
+    state.entity = nil
+    state.entity_name = nil
+    state.surface_index = nil
+    state.position = nil
+end
+
+--- Clears one player's persisted picker state without touching other players.
+---@param player_index uint
+local function clear_player_picker_state(player_index)
+    if storage.craft_deco_2_variant_picker then
+        storage.craft_deco_2_variant_picker[player_index] = nil
+    end
+end
+
+--- Clears all persisted picker state.
+local function clear_all_picker_state()
+    storage.craft_deco_2_variant_picker = {}
+end
+
+--- Attempts to re-resolve a picker entity from saved stable fields.
+---@param state CraftDecoVariantPickerState
+---@return LuaEntity|nil entity
+local function resolve_saved_picker_entity(state)
+    if not (state.entity_name and state.surface_index and state.position) then
+        return nil
+    end
+
+    local surface = game.get_surface(state.surface_index)
+    if not surface then
+        return nil
+    end
+
+    local entity = surface.find_entity(state.entity_name, state.position)
+    if entity and entity.valid then
+        state.entity = entity
+        return entity
+    end
+
+    return nil
+end
+
+--- Returns whether the player's currently opened object is this picker frame.
+---@param player LuaPlayer
+---@return boolean is_opened_picker
+local function player_opened_is_picker(player)
+    local opened = player.opened
+    return opened ~= nil
+        and opened.valid
+        and opened.object_name == "LuaGuiElement"
+        and opened.name == GUI_NAME
+end
+
+--- Returns whether another opened object should prevent opening this picker.
+---@param player LuaPlayer
+---@return boolean is_blocked
+local function player_has_other_opened_object(player)
+    local opened = player.opened
+    return opened ~= nil and opened.valid and not player_opened_is_picker(player)
+end
+
 --- Destroys the variant picker for a player and clears its saved entity handle.
 ---@param player LuaPlayer|nil
 local function close_variant_picker(player)
@@ -392,12 +496,13 @@ local function close_variant_picker(player)
 
     local root = player.gui.screen[GUI_NAME]
     if root and root.valid then
+        if player_opened_is_picker(player) then
+            player.opened = nil
+        end
         root.destroy()
     end
 
-    if storage.craft_deco_2_variant_picker then
-        storage.craft_deco_2_variant_picker[player.index] = nil
-    end
+    clear_player_picker_state(player.index)
 end
 
 --- Safely resolves the entity currently edited by the picker.
@@ -414,9 +519,9 @@ local function picker_entity(player)
         return entity
     end
 
-    entity = selected_tracked_entity(player)
+    entity = resolve_saved_picker_entity(state) or selected_tracked_entity(player)
     if entity then
-        state.entity = entity
+        set_player_picker_entity(player.index, entity)
         return entity
     end
 
@@ -424,23 +529,58 @@ local function picker_entity(player)
     return nil
 end
 
+--- Picker GUI construction ----------------------------------------------------
+
+--- Returns the full GUI element name for a picker child element.
+---@param suffix string
+---@return string name
+local function picker_element_name(suffix)
+    return GUI_PREFIX .. suffix
+end
+
 --- Returns tooltip text for a runtime variant button.
 ---@param label string
 ---@param index integer
 ---@param current integer|nil
 ---@return string caption
-local function numbered_caption(label, index, current)
+local function variant_tooltip(label, index, current)
     if current == index then
         return "[" .. label .. " " .. index .. "]"
     end
+
     return label .. " " .. index
 end
 
---- Applies the common square button size used by variant picker sprites.
+--- Applies the common square size used by all picker sprite buttons.
 ---@param button LuaGuiElement
-local function apply_variant_button_style(button)
+local function style_variant_button(button)
     button.style.width = BUTTON_SIZE
     button.style.height = BUTTON_SIZE
+end
+
+--- Adds a square sprite button used by the picker.
+---@param parent LuaGuiElement
+---@param name_suffix string
+---@param sprite string
+---@param tooltip LocalisedString|string
+---@param tags Tags
+---@param selected boolean|nil
+---@return LuaGuiElement button
+local function add_picker_sprite_button(parent, name_suffix, sprite, tooltip, tags, selected)
+    local button = parent.add({
+        type = "sprite-button",
+        name = picker_element_name(name_suffix),
+        sprite = sprite,
+        tooltip = tooltip,
+        tags = tags,
+    })
+
+    style_variant_button(button)
+    if selected then
+        button.enabled = false
+    end
+
+    return button
 end
 
 --- Adds a selectable prototype-group button.
@@ -449,18 +589,14 @@ end
 ---@param current_name string
 local function add_prototype_button(parent, prototype_name, current_name)
     local prototype = prototypes.entity[prototype_name]
-    local button = parent.add({
-        type = "sprite-button",
-        name = GUI_PREFIX .. "prototype-" .. prototype_name,
-        sprite = "entity/" .. prototype_name,
-        tooltip = prototype and prototype.localised_name or prototype_name,
-        tags = { craft_deco_2_action = "prototype", prototype_name = prototype_name },
-    })
-
-    apply_variant_button_style(button)
-    if prototype_name == current_name then
-        button.enabled = false
-    end
+    add_picker_sprite_button(
+        parent,
+        "prototype-" .. prototype_name,
+        "entity/" .. prototype_name,
+        prototype and prototype.localised_name or prototype_name,
+        { craft_deco_2_action = "prototype", prototype_name = prototype_name },
+        prototype_name == current_name
+    )
 end
 
 --- Returns the generated GUI sprite name for a runtime variant.
@@ -480,51 +616,89 @@ end
 ---@param index integer
 ---@param current integer|nil
 local function add_variant_sprite_button(parent, entity, action, label, index, current)
-    local button = parent.add({
-        type = "sprite-button",
-        name = GUI_PREFIX .. action .. "-" .. index,
-        sprite = variant_sprite_name(entity.name, action, index),
-        tooltip = numbered_caption(label, index, current),
-        tags = { craft_deco_2_action = action, index = index },
-    })
-
-    apply_variant_button_style(button)
-    if current == index then
-        button.enabled = false
-    end
+    add_picker_sprite_button(
+        parent,
+        action .. "-" .. index,
+        variant_sprite_name(entity.name, action, index),
+        variant_tooltip(label, index, current),
+        { craft_deco_2_action = action, index = index },
+        current == index
+    )
 end
 
---- Adds an inset section with a header and a fixed six-column button table.
+--- Adds a caption label to a variant section.
+---@param parent LuaGuiElement
+---@param caption LocalisedString|string
+local function add_section_caption(parent, caption)
+    local label = parent.add({ type = "label", caption = caption })
+    label.style.bottom_margin = 6
+end
+
+--- Adds a fixed six-column table for section buttons.
+---@param parent LuaGuiElement
+---@return LuaGuiElement table_element
+local function add_variant_button_table(parent)
+    local table_element = parent.add({ type = "table", column_count = BUTTON_COLUMNS })
+    table_element.style.horizontal_spacing = BUTTON_SPACING
+    table_element.style.vertical_spacing = BUTTON_SPACING
+    table_element.style.horizontally_stretchable = false
+    return table_element
+end
+
+--- Adds an inset section with a header and six-column button table.
 ---@param parent LuaGuiElement
 ---@param caption LocalisedString|string
 ---@return LuaGuiElement table_element
 local function add_section(parent, caption)
-    local outer = parent.add({ type = "frame", direction = "vertical", style = "inside_deep_frame" })
-    outer.style.minimal_width = SECTION_WIDTH
-    outer.style.maximal_width = SECTION_WIDTH
-    outer.style.bottom_margin = 10
-    outer.style.padding = 6
+    local section = parent.add({ type = "frame", direction = "vertical", style = "inside_deep_frame" })
+    section.style.horizontally_stretchable = false
+    section.style.bottom_margin = 10
+    section.style.padding = 6
 
-    local label = outer.add({ type = "label", caption = caption })
-    label.style.bottom_margin = 6
-
-    local table_element = outer.add({ type = "table", column_count = BUTTON_COLUMNS })
-    table_element.style.horizontal_spacing = BUTTON_SPACING
-    table_element.style.vertical_spacing = BUTTON_SPACING
-    return table_element
+    add_section_caption(section, caption)
+    return add_variant_button_table(section)
 end
 
---- Adds the centered selected-entity summary line.
+--- Returns the localised selected-entity summary caption.
+---@param entity LuaEntity
+---@return LocalisedString caption
+local function selected_label_caption(entity)
+    return { "", "Selected: ", entity.localised_name, " (", entity.name, ")" }
+end
+
+--- Adds the selected-entity summary line outside the scrolling content.
 ---@param parent LuaGuiElement
 ---@param entity LuaEntity
+---@return LuaGuiElement selected
 local function add_selected_label(parent, entity)
     local selected = parent.add({
         type = "label",
-        caption = { "", "Selected: ", entity.localised_name, " (", entity.name, ")" },
+        name = picker_element_name("selected"),
+        caption = selected_label_caption(entity),
     })
+    selected.style.font = "default-bold"
     selected.style.horizontal_align = "center"
     selected.style.horizontally_stretchable = true
+    selected.style.top_margin = 6
     selected.style.bottom_margin = 10
+    return selected
+end
+
+--- Updates the selected-entity summary when a prototype replacement occurs.
+---@param frame LuaGuiElement
+---@param entity LuaEntity
+local function update_selected_label(frame, entity)
+    local selected = frame[picker_element_name("selected")]
+    if selected and selected.valid then
+        selected.caption = selected_label_caption(entity)
+    end
+end
+
+--- Adds a small scrollable gutter so the first section's top border is visible.
+---@param parent LuaGuiElement
+local function add_scroll_top_gutter(parent)
+    local spacer = parent.add({ type = "empty-widget" })
+    spacer.style.height = SCROLL_TOP_GUTTER
 end
 
 --- Adds prototype-group buttons when the selected entity belongs to a group.
@@ -580,6 +754,72 @@ local function add_graphics_section(parent, entity)
     end
 end
 
+--- Returns the number of button rows needed for a variant count.
+---@param count integer|nil
+---@return integer rows
+local function button_row_count(count)
+    if not count or count < 1 then
+        return 0
+    end
+
+    return math.ceil(count / BUTTON_COLUMNS)
+end
+
+--- Returns the estimated height of one inset section.
+---@param count integer|nil
+---@return integer height
+local function section_height_for_count(count)
+    local rows = button_row_count(count)
+    if rows == 0 then
+        return 0
+    end
+
+    return rows * (BUTTON_SIZE + BUTTON_SPACING) + SECTION_HEIGHT_GUTTER
+end
+
+--- Returns the estimated scrollable content height for the selected entity.
+---@param entity LuaEntity
+---@return integer height
+local function picker_scroll_content_height(entity)
+    local height = SCROLL_TOP_GUTTER
+
+    local group = prototype_groups[entity.name]
+    if group and #group > 1 then
+        height = height + section_height_for_count(#group)
+    end
+
+    if is_tree(entity) then
+        height = height + section_height_for_count(tree_color_counts[entity.name])
+    end
+
+    height = height + section_height_for_count(variation_counts[entity.name])
+    return height
+end
+
+--- Returns whether the picker will need a vertical scrollbar for this entity.
+---@param entity LuaEntity
+---@return boolean needs_scrollbar
+local function picker_needs_vertical_scrollbar(entity)
+    return picker_scroll_content_height(entity) > SCROLL_HEIGHT
+end
+
+--- Applies the compact or scrollbar-aware picker width.
+---@param frame LuaGuiElement
+---@param scroll LuaGuiElement
+---@param content LuaGuiElement
+---@param entity LuaEntity
+local function apply_picker_width(frame, scroll, content, entity)
+    local has_scrollbar = picker_needs_vertical_scrollbar(entity)
+    local frame_width = has_scrollbar and FRAME_WIDTH_WITH_SCROLLBAR or FRAME_WIDTH_NO_SCROLLBAR
+    local scroll_width = has_scrollbar and SCROLL_WIDTH_WITH_SCROLLBAR or SCROLL_WIDTH_NO_SCROLLBAR
+    local content_width = has_scrollbar and CONTENT_WIDTH_WITH_SCROLLBAR or CONTENT_WIDTH_NO_SCROLLBAR
+
+    frame.style.minimal_width = frame_width
+    frame.style.maximal_width = frame_width
+    scroll.style.width = scroll_width
+    content.style.width = content_width
+end
+
 --- Rebuilds all selectable variant controls in the open picker.
 ---@param player LuaPlayer
 local function redraw_variant_picker(player)
@@ -588,19 +828,42 @@ local function redraw_variant_picker(player)
         return
     end
 
-    local frame = player.gui.screen[GUI_NAME]
-    if not (frame and frame.valid) then
+    --- Returns the active picker frame for a player.
+    ---@param player LuaPlayer
+    ---@return LuaGuiElement|nil frame
+    local function picker_frame(player)
+        local frame = player.gui.screen[GUI_NAME]
+        if frame and frame.valid then
+            return frame
+        end
+
+        return nil
+    end
+
+    --- Returns the picker scroll pane and content flow.
+    ---@param frame LuaGuiElement
+    ---@return LuaGuiElement|nil scroll
+    ---@return LuaGuiElement|nil content
+    local function picker_scroll_elements(frame)
+        local scroll = frame[picker_element_name("scroll")]
+        local content = scroll and scroll.valid and scroll[picker_element_name("content")] or nil
+        return scroll, content
+    end
+
+    local frame = picker_frame(player)
+    if not frame then
         return
     end
 
-    local scroll = frame[GUI_PREFIX .. "scroll"]
-    local content = scroll and scroll.valid and scroll[GUI_PREFIX .. "content"]
-    if not (content and content.valid) then
+    local scroll, content = picker_scroll_elements(frame)
+    if not (scroll and content and content.valid) then
         return
     end
 
+    apply_picker_width(frame, scroll, content, entity)
+    update_selected_label(frame, entity)
     content.clear()
-    add_selected_label(content, entity)
+    add_scroll_top_gutter(content)
     add_prototype_section(content, entity)
     add_tree_color_section(content, entity)
     add_graphics_section(content, entity)
@@ -622,7 +885,7 @@ local function add_titlebar(frame)
 
     titlebar.add({
         type = "sprite-button",
-        name = GUI_PREFIX .. "close",
+        name = picker_element_name("close"),
         sprite = "utility/close",
         style = "close_button",
         tags = { craft_deco_2_action = "close" },
@@ -633,34 +896,46 @@ end
 ---@param frame LuaGuiElement
 ---@return LuaGuiElement content_flow
 local function add_scroll_content(frame)
-    local scroll = frame.add({ type = "scroll-pane", name = GUI_PREFIX .. "scroll" })
-    scroll.style.minimal_width = SCROLL_WIDTH
-    scroll.style.maximal_width = SCROLL_WIDTH
+    local scroll = frame.add({ type = "scroll-pane", name = picker_element_name("scroll") })
+    scroll.style.width = SCROLL_WIDTH_NO_SCROLLBAR
     scroll.style.maximal_height = SCROLL_HEIGHT
-    scroll.style.horizontally_stretchable = true
+    scroll.style.horizontally_stretchable = false
+    scroll.horizontal_scroll_policy = "never"
+    scroll.vertical_scroll_policy = "auto"
 
-    local content_flow = scroll.add({ type = "flow", name = GUI_PREFIX .. "content", direction = "vertical" })
-    content_flow.style.horizontally_stretchable = true
+    local content_flow = scroll.add({ type = "flow", name = picker_element_name("content"), direction = "vertical" })
+    content_flow.style.width = CONTENT_WIDTH_NO_SCROLLBAR
+    content_flow.style.horizontally_stretchable = false
+    content_flow.style.horizontal_align = "center"
     return content_flow
 end
 
 --- Opens the variant picker for the currently selected supported entity.
 ---@param player LuaPlayer|nil
 function variant_cycler.open_variant_picker(player)
+    if not (player and player.valid) then
+        return
+    end
+
     local entity = selected_tracked_entity(player)
-    if not (player and entity) then
+    if not entity then
+        return
+    end
+
+    if player_has_other_opened_object(player) then
         return
     end
 
     close_variant_picker(player)
-    player_gui_state(player.index).entity = entity
+    set_player_picker_entity(player.index, entity)
 
     local frame = player.gui.screen.add({ type = "frame", name = GUI_NAME, direction = "vertical" })
-    frame.style.minimal_width = FRAME_WIDTH
-    frame.style.maximal_width = FRAME_WIDTH
+    frame.style.minimal_width = FRAME_WIDTH_NO_SCROLLBAR
+    frame.style.maximal_width = FRAME_WIDTH_NO_SCROLLBAR
     frame.style.maximal_height = 760
 
     add_titlebar(frame)
+    add_selected_label(frame, entity)
     add_scroll_content(frame)
 
     frame.force_auto_center()
@@ -707,8 +982,8 @@ function variant_cycler.on_gui_click(event)
         if type(prototype_name) == "string" and prototype_name ~= entity.name and prototypes.entity[prototype_name] then
             local position = entity.position
             if replace_with_prototype(entity, prototype_name, player) then
-                player_gui_state(player.index).entity = player.surface.find_entity(prototype_name, position) or
-                    selected_tracked_entity(player)
+                set_player_picker_entity(player.index,
+                    player.surface.find_entity(prototype_name, position) or selected_tracked_entity(player))
             end
         end
     elseif action == "tree-color" then
@@ -724,7 +999,8 @@ end
 ---@param event EventData.on_gui_closed
 function variant_cycler.on_gui_closed(event)
     local player = game.get_player(event.player_index)
-    if player and event.element and event.element.valid and event.element.name == GUI_NAME then
+    local element = event.element
+    if player and element and element.valid and element.name == GUI_NAME then
         close_variant_picker(player)
     end
 end
@@ -753,6 +1029,42 @@ function variant_cycler.on_cycle_shape_variant(event)
     if entity then
         cycle_graphics_variation(entity)
     end
+end
+
+--- Clears GUI state for a removed player.
+---@param event EventData.on_player_removed
+function variant_cycler.on_player_removed(event)
+    clear_player_picker_state(event.player_index)
+end
+
+--- Clears runtime LuaEntity/LuaGuiElement references after configuration changes.
+function variant_cycler.on_configuration_changed()
+    clear_all_picker_state()
+end
+
+--- Ensures newly created supported decorative entities are neutral.
+---@param entity LuaEntity|nil
+local function neutralize_created_entity(entity)
+    if not (entity and entity.valid) then
+        return
+    end
+
+    tracked_names = tracked_names or build_tracked_names()
+    if tracked_names[entity.name] then
+        set_neutral_force(entity)
+    end
+end
+
+--- Handles entities created by players or script.
+---@param event EventData.on_built_entity|EventData.script_raised_built|EventData.script_raised_revive
+function variant_cycler.on_entity_created(event)
+    neutralize_created_entity(event.entity)
+end
+
+--- Handles entities created by construction robots.
+---@param event EventData.on_robot_built_entity
+function variant_cycler.on_robot_built_entity(event)
+    neutralize_created_entity(event.entity)
 end
 
 ---@cast variant_cycler VariantCycler
