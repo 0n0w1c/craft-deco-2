@@ -141,4 +141,11 @@ return {
     ["tree-wetland-n"] = 8,
     ["tree-wetland-o"] = 12,
     ["water-cane"] = 16,
+    ["vulcanus-chimney"] = 3,
+    ["vulcanus-chimney-cold"] = 3,
+    ["vulcanus-chimney-faded"] = 5,
+    ["vulcanus-chimney-short"] = 7,
+    ["vulcanus-chimney-truncated"] = 6,
+    ["ashland-lichen-tree"] = 12,
+    ["ashland-lichen-tree-flaming"] = 5,
 }

@@ -10,23 +10,30 @@ local MAX_PREVIEW_SIZE = 80
 
 ---@class CraftDecoSpriteSource
 ---@field filename string|nil
+---@field filenames string[]|nil
 ---@field width number|nil
 ---@field height number|nil
 ---@field size number|CraftDecoSpriteSize|nil
 ---@field x number|nil
 ---@field y number|nil
+---@field line_length integer|nil
+---@field variation_count integer|nil
 ---@field scale number|nil
+---@field shift table|nil
 ---@field tint table|nil
 ---@field flags table|nil
 ---@field mipmap_count number|nil
 ---@field priority string|nil
+---@field surface string|nil
+---@field draw_as_shadow boolean|nil
+---@field draw_as_glow boolean|nil
+---@field draw_as_light boolean|nil
 ---@field layers CraftDecoSpriteSource[]|nil
 ---@field sheets CraftDecoSpriteSource[]|nil
 
 ---@type table<string, boolean>
-local generated = {}
+local generated_sprite_names = {}
 
---- Returns explicit width and height values for a sprite source.
 ---@param source CraftDecoSpriteSource
 ---@return number|nil width
 ---@return number|nil height
@@ -37,25 +44,21 @@ local function normalize_size(source)
 
     ---@type number|CraftDecoSpriteSize|nil
     local size = source.size
-
     if type(size) == "number" then
         return size, size
     end
 
     if type(size) == "table" then
-        local width = size[1] or size.width
-        local height = size[2] or size.height
-        return width, height
+        return size[1] or size.width, size[2] or size.height
     end
 
     return nil, nil
 end
 
---- Calculates a scale that fits a source image inside the picker button.
 ---@param width number|nil
 ---@param height number|nil
 ---@return number scale
-local function scaled_sprite_size(width, height)
+local function preview_scale(width, height)
     local longest = math.max(width or 1, height or 1)
     if longest <= 0 then
         return 1
@@ -64,10 +67,9 @@ local function scaled_sprite_size(width, height)
     return math.min(1, MAX_PREVIEW_SIZE / longest)
 end
 
---- Deep-copies a tint/color table when present.
 ---@param color table|nil
 ---@return table|nil copy
-local function color_copy(color)
+local function copy_color(color)
     if not color then
         return nil
     end
@@ -75,30 +77,44 @@ local function color_copy(color)
     return table.deepcopy(color)
 end
 
---- Finds the first directly renderable layer from a nested sprite definition.
+---@param source CraftDecoSpriteSource|nil
+---@return boolean renderable
+local function is_renderable_source(source)
+    return source ~= nil and (source.filename ~= nil or source.filenames ~= nil)
+end
+
+---@param source CraftDecoSpriteSource
+---@return table[] child_lists
+local function sprite_child_lists(source)
+    local child_lists = {}
+
+    if source.layers then
+        child_lists[#child_lists + 1] = source.layers
+    end
+
+    if source.sheets then
+        child_lists[#child_lists + 1] = source.sheets
+    end
+
+    return child_lists
+end
+
 ---@param source CraftDecoSpriteSource|nil
 ---@return CraftDecoSpriteSource|nil layer
-local function first_renderable_layer(source)
+local function first_renderable_source(source)
     if not source then
         return nil
     end
 
-    if source.filename then
+    if is_renderable_source(source) then
         return source
     end
 
-    if source.layers then
-        for _, layer in pairs(source.layers) do
-            if layer.filename then
-                return layer
-            end
-        end
-    end
-
-    if source.sheets then
-        for _, sheet in pairs(source.sheets) do
-            if sheet.filename then
-                return sheet
+    for _, children in pairs(sprite_child_lists(source)) do
+        for _, child in pairs(children) do
+            local renderable = first_renderable_source(child)
+            if renderable then
+                return renderable
             end
         end
     end
@@ -106,95 +122,282 @@ local function first_renderable_layer(source)
     return nil
 end
 
---- Returns a source sprite for a graphics variation preview.
----@param entity table|nil Prototype table from data.raw.
----@param index integer Variation index to preview.
+---@param source CraftDecoSpriteSource|nil
+---@param result CraftDecoSpriteSource[]|nil
+---@return CraftDecoSpriteSource[] result
+local function collect_renderable_sources(source, result)
+    result = result or {}
+    if not source then
+        return result
+    end
+
+    if is_renderable_source(source) then
+        result[#result + 1] = source
+        return result
+    end
+
+    for _, children in pairs(sprite_child_lists(source)) do
+        for _, child in pairs(children) do
+            collect_renderable_sources(child, result)
+        end
+    end
+
+    return result
+end
+
+---@param source CraftDecoSpriteSource|nil
+---@return integer count
+local function source_variation_count(source)
+    if not source then
+        return 0
+    end
+
+    local count = 0
+    if source.variation_count then
+        count = math.max(count, source.variation_count)
+    end
+    if source.filenames then
+        count = math.max(count, #source.filenames)
+    end
+    if source.filename and count == 0 then
+        count = 1
+    end
+
+    for _, children in pairs(sprite_child_lists(source)) do
+        for _, child in pairs(children) do
+            count = math.max(count, source_variation_count(child))
+        end
+    end
+
+    return count
+end
+
+--- Selects one concrete image from normal spritesheets or Space Age filename lists.
+---@param source CraftDecoSpriteSource|nil
+---@param index integer
 ---@return CraftDecoSpriteSource|nil source
-local function variation_picture(entity, index)
-    if not entity then
+local function source_for_variation(source, index)
+    source = first_renderable_source(source)
+    if not source then
         return nil
+    end
+
+    ---@type CraftDecoSpriteSource
+    local selected = table.deepcopy(source)
+    local width, height = normalize_size(selected)
+    if not width or not height then
+        return nil
+    end
+
+    if selected.filenames and #selected.filenames > 0 then
+        selected.filename = selected.filenames[((index - 1) % #selected.filenames) + 1]
+        selected.filenames = nil
+        selected.x = selected.x or 0
+        selected.y = selected.y or 0
+        return selected
+    end
+
+    if selected.filename and selected.variation_count and selected.variation_count > 1 then
+        local line_length = selected.line_length or selected.variation_count
+        local zero_based = (index - 1) % selected.variation_count
+        selected.x = (selected.x or 0) + (zero_based % line_length) * width
+        selected.y = (selected.y or 0) + math.floor(zero_based / line_length) * height
+    end
+
+    return selected
+end
+
+---@param source CraftDecoSpriteSource|nil
+---@param index integer
+---@return CraftDecoSpriteSource[] layers
+local function layers_for_variation(source, index)
+    local layers = {}
+
+    for _, renderable in pairs(collect_renderable_sources(source)) do
+        local layer = source_for_variation(renderable, index)
+        if layer then
+            layers[#layers + 1] = layer
+        end
+    end
+
+    return layers
+end
+
+---@param layers CraftDecoSpriteSource[]
+---@param source CraftDecoSpriteSource|nil
+---@param index integer
+local function append_layer(layers, source, index)
+    local layer = source_for_variation(source, index)
+    if layer then
+        layers[#layers + 1] = layer
+    end
+end
+
+--- Returns preview layers for tree variations with separate trunk/leaves images.
+---@param variation table|nil
+---@param index integer
+---@return CraftDecoSpriteSource[] layers
+local function tree_variation_layers(variation, index)
+    local layers = {}
+    if not variation then
+        return layers
+    end
+
+    append_layer(layers, variation.trunk, index)
+    append_layer(layers, variation.leaves, index)
+
+    if #layers > 0 then
+        return layers
+    end
+
+    append_layer(layers, variation.picture, index)
+    if #layers > 0 then
+        return layers
+    end
+
+    return layers_for_variation(variation, index)
+end
+
+--- Returns sprite layers for a graphics-variation preview.
+---
+--- Trees with explicit trunk/leaves use both layers. Entities with
+--- pictures[index].layers, such as ashland trees, use the first visible layer
+--- only so shadow layers do not distort GUI previews.
+---@param entity table|nil
+---@param index integer
+---@return CraftDecoSpriteSource[] layers
+local function graphics_preview_layers(entity, index)
+    if not entity then
+        return {}
     end
 
     local variation = entity.variations and entity.variations[index]
     if variation then
-        return first_renderable_layer(variation.leaves)
-            or first_renderable_layer(variation.trunk)
-            or first_renderable_layer(variation.picture)
-            or first_renderable_layer(variation)
+        return tree_variation_layers(variation, index)
     end
 
     if entity.pictures then
-        if entity.pictures.filename or entity.pictures.layers then
-            return first_renderable_layer(entity.pictures)
+        if entity.pictures.filename or entity.pictures.filenames or entity.pictures.layers or entity.pictures.sheets then
+            return layers_for_variation(entity.pictures, index)
         end
 
-        return first_renderable_layer(entity.pictures[index])
+        local picture = source_for_variation(entity.pictures[index], index)
+        if picture then
+            return { picture }
+        end
+
+        return {}
     end
 
-    return first_renderable_layer(entity.picture)
+    return layers_for_variation(entity.picture, index)
 end
 
---- Returns a source sprite to tint for tree-color previews.
----@param entity table|nil Prototype table from data.raw.
+---@param entity table|nil
 ---@return CraftDecoSpriteSource|nil source
-local function tree_color_picture(entity)
+local function tree_color_preview_source(entity)
     if not entity then
         return nil
     end
 
     local variation = entity.variations and entity.variations[1]
     if variation then
-        return first_renderable_layer(variation.leaves)
-            or first_renderable_layer(variation.trunk)
-            or first_renderable_layer(variation)
+        return source_for_variation(variation.leaves, 1)
+            or source_for_variation(variation.trunk, 1)
+            or source_for_variation(variation, 1)
     end
 
-    return variation_picture(entity, 1)
+    local layers = graphics_preview_layers(entity, 1)
+    return layers[1]
 end
 
---- Creates a SpritePrototype for a GUI preview button.
----@param name string
----@param source CraftDecoSpriteSource|nil
+---@param source CraftDecoSpriteSource
 ---@param tint table|nil
-local function add_gui_sprite(name, source, tint)
-    source = first_renderable_layer(source)
-    if not source or not source.filename or generated[name] then
-        return
-    end
-
+---@return table|nil layer
+local function make_sprite_layer(source, tint)
     local width, height = normalize_size(source)
-    if not width or not height then
-        return
+    if not width or not height or not source.filename then
+        return nil
     end
 
-    local sprite = {
-        type = "sprite",
-        name = name,
+    local layer = {
         filename = source.filename,
         width = width,
         height = height,
         x = source.x,
         y = source.y,
-        scale = scaled_sprite_size(width, height),
-        tint = color_copy(tint) or color_copy(source.tint),
+        scale = preview_scale(width, height),
+        shift = source.shift and table.deepcopy(source.shift) or nil,
+        tint = copy_color(tint) or copy_color(source.tint),
     }
 
     if source.flags then
-        sprite.flags = table.deepcopy(source.flags)
+        layer.flags = table.deepcopy(source.flags)
     end
     if source.mipmap_count then
-        sprite.mipmap_count = source.mipmap_count
+        layer.mipmap_count = source.mipmap_count
     end
     if source.priority then
-        sprite.priority = source.priority
+        layer.priority = source.priority
+    end
+    if source.surface then
+        layer.surface = source.surface
+    end
+    if source.draw_as_shadow then
+        layer.draw_as_shadow = source.draw_as_shadow
+    end
+    if source.draw_as_glow then
+        layer.draw_as_glow = source.draw_as_glow
+    end
+    if source.draw_as_light then
+        layer.draw_as_light = source.draw_as_light
     end
 
-    generated[name] = true
+    return layer
+end
+
+---@param sources CraftDecoSpriteSource[]|CraftDecoSpriteSource|nil
+---@return CraftDecoSpriteSource[] layers
+local function normalize_layer_list(sources)
+    if not sources then
+        return {}
+    end
+
+    if sources.filename or sources.filenames then
+        return { sources }
+    end
+
+    return sources
+end
+
+---@param name string
+---@param sources CraftDecoSpriteSource[]|CraftDecoSpriteSource|nil
+---@param tint table|nil
+local function add_gui_sprite(name, sources, tint)
+    if generated_sprite_names[name] then
+        return
+    end
+
+    local layers = {}
+    for _, source in pairs(normalize_layer_list(sources)) do
+        local layer = make_sprite_layer(source, tint)
+        if layer then
+            layers[#layers + 1] = layer
+        end
+    end
+
+    if #layers == 0 then
+        return
+    end
+
+    local sprite = #layers == 1 and layers[1] or { layers = layers }
+    sprite.type = "sprite"
+    sprite.name = name
+
+    generated_sprite_names[name] = true
     data:extend({ sprite })
 end
 
---- Counts prototype picture entries that can be sampled for graphics previews.
----@param entity table|nil Prototype table from data.raw.
+---@param entity table|nil
 ---@return integer count
 local function graphics_picture_count(entity)
     if not entity then
@@ -205,19 +408,18 @@ local function graphics_picture_count(entity)
         return #entity.variations
     end
 
-    if entity.pictures and not entity.pictures.filename then
+    if entity.pictures then
+        if entity.pictures.filename or entity.pictures.filenames or entity.pictures.layers or entity.pictures.sheets then
+            return source_variation_count(entity.pictures)
+        end
+
         return #entity.pictures
     end
 
-    if entity.picture then
-        return 1
-    end
-
-    return 0
+    return source_variation_count(entity.picture)
 end
 
---- Creates graphics-variation preview sprites for an entity.
----@param entity table|nil Prototype table from data.raw.
+---@param entity table|nil
 local function make_graphics_sprites(entity)
     if not entity or not entity.name then
         return
@@ -235,19 +437,18 @@ local function make_graphics_sprites(entity)
 
         add_gui_sprite(
             "craft-deco-2-graphics-" .. entity.name .. "-" .. index,
-            variation_picture(entity, picture_index)
+            graphics_preview_layers(entity, picture_index)
         )
     end
 end
 
---- Creates tinted tree-color preview sprites for an entity.
----@param entity table|nil Prototype table from data.raw.
+---@param entity table|nil
 local function make_tree_color_sprites(entity)
     if not entity or not entity.name or not entity.colors then
         return
     end
 
-    local source = tree_color_picture(entity)
+    local source = tree_color_preview_source(entity)
     if not source then
         return
     end
@@ -263,7 +464,6 @@ local function make_tree_color_sprites(entity)
     end
 end
 
---- Generates all variant-picker preview sprites for supported entity types.
 local function generate_variant_picker_sprites()
     for _, entity_type in pairs({ "tree", "simple-entity" }) do
         if data.raw[entity_type] then

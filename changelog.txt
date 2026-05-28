@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.2
+Date: 28.05.2026
+  Bugfixes:
+    - Ashland trees and chimneys were not available via the gui
+    - Teflilly and funneltrunk gui sprites were missing layers
+  Changes:
+    - None
+---------------------------------------------------------------------------------------------------
 Version: 0.3.1
 Date: 28.05.2026
   Bugfixes:
