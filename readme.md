@@ -6,7 +6,7 @@ Craft rocks, trees, and more.
 
 #### Variant cycling
 
-- `Ctrl + left-click` - Open the selector
+- `Shift + left-click` - Open the selector
 - `Shift + V` - Cycle the tint  
 - `Shift + B` - Cycle the variant   
 
