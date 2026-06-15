@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.3.4
+Date: 14.06.2026
+  Bugfixes:
+    - None
+  Changes:
+    - Changed to Ctrl + left-click to open the selector
+---------------------------------------------------------------------------------------------------
 Version: 0.3.3
 Date: 14.06.2026
   Bugfixes:
@@ -25,14 +32,14 @@ Date: 28.05.2026
 Version: 0.3.0
 Date: 28.05.2026
   Bugfixes:
-    - More adjustments to the GUI
+    - More adjustments to the selector
   Changes:
     - Added multiplayer compatability
 ---------------------------------------------------------------------------------------------------
 Version: 0.2.1
 Date: 28.05.2026
   Bugfixes:
-    - Minor adjustment to the GUI
+    - Minor adjustment to the selector
   Changes:
     - None
 ---------------------------------------------------------------------------------------------------
@@ -41,7 +48,7 @@ Date: 28.05.2026
   Bugfixes:
     - None
   Changes:
-    - Added a Decorative variants GUI (left click)
+    - Added a Decorative variants selector (left click)
 ---------------------------------------------------------------------------------------------------
 Version: 0.1.1
 Date: 28.05.2026

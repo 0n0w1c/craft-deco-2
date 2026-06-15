@@ -1,5 +1,3 @@
---- Custom input prototypes for cycling decorative variants.
-
 data:extend({
     {
         type = "custom-input",
@@ -31,9 +29,10 @@ data:extend({
     {
         type = "custom-input",
         name = "craft-deco-2-open-variant-picker-click",
-        key_sequence = "",
-        linked_game_control = "open-gui",
-        consuming = "none",
+        key_sequence = "CONTROL + mouse-button-1",
+        consuming = "game-only",
         include_selected_prototype = true,
+        localised_name = { "controls.craft-deco-2-open-variant-picker-click" },
+        localised_description = { "controls-description.craft-deco-2-open-variant-picker-click" },
     },
 })

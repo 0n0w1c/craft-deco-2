@@ -918,6 +918,11 @@ function variant_cycler.open_variant_picker(player)
         return
     end
 
+    local cursor_stack = player.cursor_stack
+    if cursor_stack and cursor_stack.valid_for_read then
+        return
+    end
+
     local entity = selected_tracked_entity(player)
     if not entity then
         return
