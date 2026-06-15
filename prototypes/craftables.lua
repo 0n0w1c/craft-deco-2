@@ -1,5 +1,3 @@
---- Creates craftable items and recipes for configured vanilla and Space Age entities.
-
 local utils = require("utils")
 local base_rocks = CRAFTDECO2.CONFIG.BASE_ROCKS
 local craftable_trees = CRAFTDECO2.CONFIG.CRAFTABLE_TREES

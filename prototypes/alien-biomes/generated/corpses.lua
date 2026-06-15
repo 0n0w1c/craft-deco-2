@@ -1,4 +1,3 @@
---- Generated Alien Biomes corpse prototypes from data.raw.
 ---@return table[] prototypes
 
 return {

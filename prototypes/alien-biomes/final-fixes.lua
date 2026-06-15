@@ -1,5 +1,3 @@
---- Data-final-fixes-stage polish for Alien Biomes craftable rocks.
-
 if not mods["alien-biomes-graphics"] then return end
 
 local constants = require("prototypes.alien-biomes.constants")

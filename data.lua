@@ -1,5 +1,3 @@
---- Data-stage entry point for craft-deco-2 prototypes.
-
 CRAFTDECO2 = require("config")
 
 require("prototypes.variant-cycler-input")

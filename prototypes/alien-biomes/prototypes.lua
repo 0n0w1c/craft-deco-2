@@ -1,5 +1,3 @@
---- Data-stage Alien Biomes prototype definitions backed by alien-biomes-graphics.
-
 if not mods["alien-biomes-graphics"] then return end
 
 local tree_def_chunks = {

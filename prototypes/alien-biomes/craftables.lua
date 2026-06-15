@@ -1,5 +1,3 @@
---- Data-updates-stage craftable integration for Alien Biomes trees and rocks.
-
 if not mods["alien-biomes-graphics"] then return end
 
 local constants = require("prototypes.alien-biomes.constants")

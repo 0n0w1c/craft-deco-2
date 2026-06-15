@@ -1,4 +1,3 @@
---- Generated runtime tree color counts for craft-deco-2 variant cycling.
 ---@return table<string, integer>
 
 return {

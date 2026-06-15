@@ -1,5 +1,3 @@
---- Custom input prototypes for cycling decorative variants.
-
 data:extend({
     {
         type = "custom-input",

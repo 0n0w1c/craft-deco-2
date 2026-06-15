@@ -1,4 +1,3 @@
---- Shared Alien Biomes prototype name lists used by craft-deco-2.
 ---@class AlienBiomesConstants
 ---@field trees string[]
 ---@field rock_colors string[]

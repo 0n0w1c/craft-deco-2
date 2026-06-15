@@ -1,4 +1,3 @@
---- Generated runtime prototype variant groups for craft-deco-2.
 ---@return table<string, string[]>
 
 return {
