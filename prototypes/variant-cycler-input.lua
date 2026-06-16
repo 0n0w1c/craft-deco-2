@@ -21,7 +21,7 @@ data:extend({
         type = "custom-input",
         name = "craft-deco-2-open-variant-picker-click",
         key_sequence = "SHIFT + mouse-button-1",
-        consuming = "game-only",
+        consuming = "none",
         include_selected_prototype = true,
         localised_name = { "controls.craft-deco-2-open-variant-picker-click" },
         localised_description = { "controls-description.craft-deco-2-open-variant-picker-click" },
