@@ -12,6 +12,13 @@ Craft rocks, trees, and more.
 
 ---
 
+#### Recommended mods
+
+- [Cliff Builder](https://mods.factorio.com/mod/cliff-builder)  
+- [OyO Snow Concrete](https://mods.factorio.com/mod/OyO-Snow-Concrete)  
+
+---
+
 #### Credits
 
 Fork of [Craft Deco](https://mods.factorio.com/mod/craft-deco)  
