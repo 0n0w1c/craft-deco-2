@@ -86,7 +86,8 @@ function utils.make_it_craftable(name, prototype_type, group, subgroup, order)
         order = order,
         stack_size = 20,
         place_result = name,
-        localised_name = entity.localised_name
+        localised_name = entity.localised_name,
+        auto_recycle = false
     }
 
     if entity.icons then
@@ -104,7 +105,10 @@ function utils.make_it_craftable(name, prototype_type, group, subgroup, order)
         name = name,
         energy_required = 1,
         enabled = false,
-        category = "crafting",
+        categories = { "crafting" },
+        allow_quality = false,
+        can_set_quality = false,
+        auto_recycle = false,
         ingredients = utils.entity_ingredients(name, prototype_type),
         results = {
             {

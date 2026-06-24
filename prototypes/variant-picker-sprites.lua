@@ -34,6 +34,21 @@ local MAX_PREVIEW_SIZE = 80
 ---@type table<string, boolean>
 local generated_sprite_names = {}
 
+---@param filename string|nil
+---@return boolean stale
+local function is_stale_preview_filename(filename)
+    if not filename then
+        return false
+    end
+
+    local vulcanus_big =
+        string.match(filename,
+            "__space%-age__/graphics/decorative/vulcanus%-rocks/vulcanus%-rock%-big%-emissive%-(%d+)%.png")
+        or string.match(filename, "__space%-age__/graphics/decorative/vulcanus%-rocks/vulcanus%-rock%-big%-(%d+)%.png")
+
+    return vulcanus_big ~= nil and tonumber(vulcanus_big) > 16
+end
+
 ---@param source CraftDecoSpriteSource
 ---@return number|nil width
 ---@return number|nil height
@@ -259,10 +274,6 @@ local function tree_variation_layers(variation, index)
 end
 
 --- Returns sprite layers for a graphics-variation preview.
----
---- Trees with explicit trunk/leaves use both layers. Entities with
---- pictures[index].layers, such as ashland trees, use the first visible layer
---- only so shadow layers do not distort GUI previews.
 ---@param entity table|nil
 ---@param index integer
 ---@return CraftDecoSpriteSource[] layers
@@ -316,6 +327,10 @@ end
 local function make_sprite_layer(source, tint)
     local width, height = normalize_size(source)
     if not width or not height or not source.filename then
+        return nil
+    end
+
+    if is_stale_preview_filename(source.filename) then
         return nil
     end
 
@@ -426,8 +441,8 @@ local function make_graphics_sprites(entity)
     end
 
     local picture_count = graphics_picture_count(entity)
-    local runtime_count = variant_counts[entity.name] or picture_count
-    local count = math.max(runtime_count, picture_count)
+    local runtime_count = variant_counts[entity.name]
+    local count = runtime_count or picture_count
 
     for index = 1, count do
         local picture_index = index

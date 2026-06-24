@@ -325,6 +325,7 @@ local function replace_with_prototype(entity, next_name, player)
     local surface = entity.surface
     local position = entity.position
     local direction = entity.direction
+    local mirroring = entity.mirroring
     local variation_state = capture_variation_state(entity)
 
     entity.destroy({ raise_destroy = true, player = player })
@@ -333,6 +334,7 @@ local function replace_with_prototype(entity, next_name, player)
         name = next_name,
         position = position,
         direction = direction,
+        mirror = mirroring,
         force = "neutral",
         player = player,
         raise_built = true,

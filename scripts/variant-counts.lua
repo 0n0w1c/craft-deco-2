@@ -23,7 +23,7 @@ return {
     ["big-fulgora-rock"] = 16,
     ["big-rock"] = 20,
     ["big-sand-rock"] = 16,
-    ["big-volcanic-rock"] = 20,
+    ["big-volcanic-rock"] = 16,
     ["boompuff"] = 14,
     ["copper-stromatolite"] = 16,
     ["cuttlepop"] = 5,

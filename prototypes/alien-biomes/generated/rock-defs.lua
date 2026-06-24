@@ -20,7 +20,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -177,7 +177,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -373,7 +373,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -530,7 +530,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -726,7 +726,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -883,7 +883,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -1079,7 +1079,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -1236,7 +1236,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -1432,7 +1432,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -1589,7 +1589,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -1785,7 +1785,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -1942,7 +1942,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -2138,7 +2138,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -2295,7 +2295,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -2491,7 +2491,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -2648,7 +2648,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -2844,7 +2844,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -3001,7 +3001,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -3197,7 +3197,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -3354,7 +3354,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -3550,7 +3550,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -3707,7 +3707,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -3903,7 +3903,7 @@ return {
             }
         },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },
@@ -4060,7 +4060,7 @@ return {
         },
         minable = { mining_particle = "stone-particle", mining_time = 1, result = "stone", count = 20 },
         loot = {
-            { item = "stone", probability = 1, count_min = 10, count_max = 20 }
+            { type = "item", name = "stone", independent_probability = 1, amount_min = 10, amount_max = 20 }
         },
         count_as_rock_for_filtered_deconstruction = true,
         mined_sound = { filename = "__base__/sound/deconstruct-bricks.ogg" },

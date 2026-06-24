@@ -150,20 +150,20 @@ end
 
 create_planet_landscaping_technology("vulcanus", {
     type = "mine-entity",
-    entity = "big-volcanic-rock"
+    entities = { "big-volcanic-rock" }
 }, data.raw["tree"]["ashland-lichen-tree-flaming"].icon, data.raw["simple-entity"]["vulcanus-chimney"].icon)
 
 create_planet_landscaping_technology("fulgora", {
     type = "mine-entity",
-    entity = "big-fulgora-rock"
+    entities = { "big-fulgora-rock" }
 }, data.raw["lightning-attractor"]["fulgoran-ruin-attractor"].icon, data.raw["simple-entity"]["big-fulgora-rock"].icon)
 
 create_planet_landscaping_technology("gleba", {
     type = "mine-entity",
-    entity = "iron-stromatolite"
+    entities = { "iron-stromatolite" }
 }, data.raw["tree"]["sunnycomb"].icon, data.raw["simple-entity"]["iron-stromatolite"].icon)
 
 create_planet_landscaping_technology("aquilo", {
     type = "mine-entity",
-    entity = "lithium-iceberg-big"
+    entities = { "lithium-iceberg-big" }
 }, data.raw["simple-entity"]["lithium-iceberg-big"].icon)
